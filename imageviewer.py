@@ -7,57 +7,23 @@ import sys
 
 import clutter
 
+
 # window size
 x = 800
 y = 600
 
 # Supported File Formats
-formats = ["*.jpg", "*.png", "*.jpeg", "*.gif", "*.JPG", "*.PNG", "*.GIF"]
-files = []
+formats = {"*.jpg", "*.png", "*.jpeg", "*.gif", "*.JPG", "*.PNG", "*.GIF"}
 
 
 # defining main class which will do all the magic
-class playbutt:
-    def mouse(self, stage, event):
-        print("x:" + str(event.x) + " y:" + str(event.y))
-        if (0 <= event.x and event.x <= ((x / 2) - 10)) and (
-            0 <= event.y and event.y <= (y / 20)
-        ):
-            print("You Pressed Button Previous")
-
-            # Changing Pic
-            self.current = self.current - 1
-            if self.current < 0:
-                self.current = self.totalfiles - 1
-            self.pic.set_from_file(self.files[self.current])
-            self.status.set_text("Current File:   " + str(self.files[self.current]))
-
-            self.rectprev.set_color(clutter.color_from_string("yellow"))
-            self.rectnext.set_color(clutter.color_from_string("blue"))
-        elif (((x / 2) + 10) <= event.x and event.x <= x) and (
-            0 <= event.y and event.y <= (y / 20)
-        ):
-            print("You Pressed Button Next")
-
-            # Changing Pic
-            self.current = self.current + 1
-            if self.current == self.totalfiles:
-                self.current = 0
-            self.pic.set_from_file(self.files[self.current])
-            self.status.set_text("Current File:   " + str(self.files[self.current]))
-
-            self.rectnext.set_color(clutter.color_from_string("yellow"))
-            self.rectprev.set_color(clutter.color_from_string("blue"))
-        else:
-            self.rectprev.set_color(clutter.color_from_string("blue"))
-            self.rectnext.set_color(clutter.color_from_string("blue"))
-
-    def __init__(self, filename, files, boolfolder):
+class Playbutt:
+    def __init__(self, filename: str, files: list[str], boolfolder: bool) -> None:
         # Some Logic for navigating through files
         self.files = files
         self.totalfiles = len(self.files)
         self.filename = filename
-        if boolfolder == True:
+        if boolfolder:
             self.current = 0
             print("Current file:" + str(self.current))
         else:
@@ -128,17 +94,61 @@ class playbutt:
         self.stage.add(self.status)
         self.stage.show_all()
 
+    def mouse(self, stage, event):
+        print("x:" + str(event.x) + " y:" + str(event.y))
+        if (0 <= event.x and event.x <= ((x / 2) - 10)) and (
+            0 <= event.y and event.y <= (y / 20)
+        ):
+            print("You Pressed Button Previous")
+
+            # Changing Pic
+            self.current = self.current - 1
+            if self.current < 0:
+                self.current = self.totalfiles - 1
+            self.pic.set_from_file(self.files[self.current])
+            self.status.set_text("Current File:   " + str(self.files[self.current]))
+
+            self.rectprev.set_color(clutter.color_from_string("yellow"))
+            self.rectnext.set_color(clutter.color_from_string("blue"))
+        elif (((x / 2) + 10) <= event.x and event.x <= x) and (
+            0 <= event.y and event.y <= (y / 20)
+        ):
+            print("You Pressed Button Next")
+
+            # Changing Pic
+            self.current = self.current + 1
+            if self.current == self.totalfiles:
+                self.current = 0
+            self.pic.set_from_file(self.files[self.current])
+            self.status.set_text("Current File:   " + str(self.files[self.current]))
+
+            self.rectnext.set_color(clutter.color_from_string("yellow"))
+            self.rectprev.set_color(clutter.color_from_string("blue"))
+        else:
+            self.rectprev.set_color(clutter.color_from_string("blue"))
+            self.rectnext.set_color(clutter.color_from_string("blue"))
+
     def main(self):
         clutter.main()
 
 
-if __name__ == "__main__":
+def main():
     boolfolder = False
 
     # Setting Current Working Directory and extracting the names ofall the pictures available
     # under that directory
+    filename: str
+    files: list[str] = []
+
+    if len(sys.argv) == 1:
+        print("Usage: python3 imageviewer.py <filename>")
+        print("Usage: python3 imageviewer.py <foldername>")
+        print("Usage: python3 imageviewer.py <path>")
+        print("Usage: python3 imageviewer.py <path to folder>")
+        sys.exit(1)
+    filename = sys.argv[1]
+
     try:
-        filename = sys.argv[1]
         if filename[len(filename) - 1] == "/":
             os.chdir(filename)
             boolfolder = True
@@ -155,5 +165,10 @@ if __name__ == "__main__":
                     files.append(nameex)
     except OSError as err:
         print("Location not available,is the drive already mounted?")
-    obj = playbutt(filename, files, boolfolder)
+
+    obj = Playbutt(filename, files, boolfolder)
     obj.main()
+
+
+if __name__ == "__main__":
+    main()
